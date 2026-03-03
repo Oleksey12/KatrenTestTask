@@ -58,6 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharType.cs" />
+    <Compile Include="FileStreamFacade.cs" />
+    <Compile Include="BaseReadonlyStreamFactory.cs" />
     <Compile Include="ILetterAnalysisStorage.cs" />
     <Compile Include="IReadOnlyStream.cs" />
     <Compile Include="LetterStats.cs" />
