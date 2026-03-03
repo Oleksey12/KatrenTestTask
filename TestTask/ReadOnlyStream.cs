@@ -6,6 +6,9 @@ namespace TestTask
     public class ReadOnlyStream : IReadOnlyStream
     {
         private Stream _localStream;
+        private StreamReader _localReader;
+
+        private bool _isEof = false;
 
         /// <summary>
         /// Конструктор класса. 
@@ -15,10 +18,36 @@ namespace TestTask
         /// <param name="fileFullPath">Полный путь до файла для чтения</param>
         public ReadOnlyStream(string fileFullPath)
         {
+            if (fileFullPath == null)
+            {
+                throw new ArgumentNullException("Передано null вместо названия файла");
+            }
+
+            if (!Directory.Exists(fileFullPath))
+            {
+                throw new DirectoryNotFoundException($"Директории с файлом {fileFullPath} не существует");
+            }
+
+            if (!File.Exists(fileFullPath))
+            {
+                throw new FileNotFoundException($"Файла в пути {fileFullPath} не существует");
+            }
+
             IsEof = true;
 
-            // TODO : Заменить на создание реального стрима для чтения файла!
-            _localStream = null;
+            try
+            {
+                _localStream = new FileStream(fileFullPath, FileMode.Open);
+                _localReader = new StreamReader(_localStream);            
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                Dispose();
+            }
         }
                 
         /// <summary>
@@ -26,8 +55,9 @@ namespace TestTask
         /// </summary>
         public bool IsEof
         {
-            get; // TODO : Заполнять данный флаг при достижении конца файла/стрима при чтении
-            private set;
+            get => _isEof;
+            
+            private set => _isEof = value;
         }
 
         /// <summary>
@@ -38,8 +68,14 @@ namespace TestTask
         /// <returns>Считанный символ.</returns>
         public char ReadNextChar()
         {
-            // TODO : Необходимо считать очередной символ из _localStream
-            throw new NotImplementedException();
+            int symbol = _localReader.Read();
+            if (symbol == -1)
+            {
+                IsEof = true;
+                throw new EndOfStreamException("Попытка чтения файла после достижения границы");
+            }
+
+            return (char)symbol;
         }
 
         /// <summary>
@@ -54,7 +90,24 @@ namespace TestTask
             }
 
             _localStream.Position = 0;
+            _localReader.DiscardBufferedData();
             IsEof = false;
+        }
+
+        /// <summary>
+        /// Закрывает потоки для работы с файлом
+        /// </summary>
+        public void Dispose()
+        {
+            if (_localReader != null)
+            {
+                _localReader.Close();
+            }
+
+            if (_localStream != null)
+            {
+                _localStream.Close();
+            }
         }
     }
 }
