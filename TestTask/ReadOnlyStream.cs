@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace TestTask
 {
@@ -16,20 +15,12 @@ namespace TestTask
         /// обеспечить ГАРАНТИРОВАННОЕ закрытие файла после окончания работы с таковым!
         /// </summary>
         /// <param name="fileFullPath">Полный путь до файла для чтения</param>
-        public ReadOnlyStream(string fileFullPath)
+        public ReadOnlyStream(Stream localStream, StreamReader localReader)
         {
             IsEof = false;
 
-            try
-            {
-                _localStream = new FileStream(fileFullPath, FileMode.Open);
-                _localReader = new StreamReader(_localStream);            
-            }
-            catch
-            {
-                Dispose();
-                throw;
-            }
+            _localStream = localStream;
+            _localReader = localReader;            
         }
                 
         /// <summary>
