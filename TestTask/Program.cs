@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace TestTask
 {
     public class Program
     {
+        private const string VOWELS = "AEIOUYАОЕЯЁЭЫУИЮaeiouyаоеяёэыуию";
 
         /// <summary>
         /// Программа принимает на входе 2 пути до файлов.
@@ -150,15 +152,19 @@ namespace TestTask
         /// <param name="charType">Тип букв для анализа</param>
         private static void RemoveCharStatsByType(IList<LetterStats> letters, CharType charType)
         {
-            // TODO : Удалить статистику по запрошенному типу букв.
             switch (charType)
             {
                 case CharType.Consonants:
+                {
+                    RemoveAllConsonants(letters);
                     break;
+                }
                 case CharType.Vowel:
+                {
+                    RemoveAllVowels(letters);
                     break;
+                }
             }
-            
         }
 
         /// <summary>
@@ -172,6 +178,24 @@ namespace TestTask
         {
             // TODO : Выводить на экран статистику. Выводить предварительно отсортировав по алфавиту!
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Удаляет все согласные из статистики
+        /// </summary>
+        /// <param name="letters">список статистики</param>
+        private static void RemoveAllConsonants(IList<LetterStats> letters)
+        {
+            letters = letters.Where(x => VOWELS.Contains(x.Letter[0])).ToList();
+        }
+
+        /// <summary>
+        /// Удаляет все гласные из статистики
+        /// </summary>
+        /// <param name="letters">список статистики</param>
+        private static void RemoveAllVowels(IList<LetterStats> letters)
+        {
+            letters = letters.Where(x => !VOWELS.Contains(x.Letter[0])).ToList();
         }
     }
 }
