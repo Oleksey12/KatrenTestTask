@@ -7,9 +7,7 @@ namespace TestTask
     /// </summary>
     internal interface ILetterAnalysisStorage
     {
-        void HandleText(string text);
-
-        void IncStatistic(LetterStats letterStats);
+        void Add(string text);
 
         IList<LetterStats> GetStatistics();
     }

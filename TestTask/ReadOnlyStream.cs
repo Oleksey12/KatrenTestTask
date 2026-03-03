@@ -18,22 +18,7 @@ namespace TestTask
         /// <param name="fileFullPath">Полный путь до файла для чтения</param>
         public ReadOnlyStream(string fileFullPath)
         {
-            if (fileFullPath == null)
-            {
-                throw new ArgumentNullException("Передано null вместо названия файла");
-            }
-
-            if (!Directory.Exists(fileFullPath))
-            {
-                throw new DirectoryNotFoundException($"Директории с файлом {fileFullPath} не существует");
-            }
-
-            if (!File.Exists(fileFullPath))
-            {
-                throw new FileNotFoundException($"Файла в пути {fileFullPath} не существует");
-            }
-
-            IsEof = true;
+            IsEof = false;
 
             try
             {
@@ -42,11 +27,8 @@ namespace TestTask
             }
             catch
             {
-                throw;
-            }
-            finally
-            {
                 Dispose();
+                throw;
             }
         }
                 

@@ -6,28 +6,28 @@ namespace TestTask
 	/// <summary>
 	/// Контейнер для подсчёта количества вхождений текста с помощью словаря
 	/// </summary>
-	public class DictionaryLetterStorage : ILetterAnalysisStorage
+	public sealed class DictionaryLetterStorage : ILetterAnalysisStorage
 	{
-		private readonly Dictionary<string, LetterStats> _data = new Dictionary<string, LetterStats>();
+		private Dictionary<string, LetterStats> _data = new Dictionary<string, LetterStats>();
 
 		/// <summary>
 		/// Обрабатывает статистику по введённому тексту 
 		/// </summary>
 		///<param name="text"></param>
-		public void HandleText(string text)
+		public void Add(string text)
 		{
-			if (_data.TryGetValue(text, out LetterStats data))
+			if (_data.TryGetValue(text, out LetterStats stats))
 			{
-				IncStatistic(data);
+				IncStatistic(text, stats);
 			} 
 			else
 			{
-				data = new LetterStats
+                stats = new LetterStats
 				{
 					Letter = text.ToString(),
 					Count = 1
 				};
-				_data.Add(text, data);
+				_data.Add(text, stats);
 			}
 		}
 
@@ -35,9 +35,10 @@ namespace TestTask
 		/// Метод увеличивает счётчик вхождений по переданной структуре.
 		/// </summary>
 		/// <param name="letterStats"></param>
-		public void IncStatistic(LetterStats letterStats)
+		private void IncStatistic(string key, LetterStats value)
 		{
-			letterStats.Count++;
+			value.Count++;
+            _data[key] = value;
 		}
 
 		/// <summary>
