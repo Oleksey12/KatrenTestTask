@@ -67,11 +67,15 @@ namespace TestTask
         /// <returns>Считанный символ.</returns>
         public char ReadNextChar()
         {
+            if (IsEof)
+            {
+                throw new EndOfStreamException("Попытка чтения файла после достижения границы");
+            }
+
             int symbol = _localReader.Read();
             if (symbol == -1)
             {
                 IsEof = true;
-                throw new EndOfStreamException("Попытка чтения файла после достижения границы");
             }
 
             return (char)symbol;

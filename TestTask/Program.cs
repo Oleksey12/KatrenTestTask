@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace TestTask
 {
     public class Program
     {
+        private const string VOWELS = "AEIOUYАОЕЯЁЭЫУИЮaeiouyаоеяёэыуию";
 
         /// <summary>
         /// Программа принимает на входе 2 пути до файлов.
@@ -16,19 +19,45 @@ namespace TestTask
         /// Второй параметр - путь до второго файла.</param>
         static void Main(string[] args)
         {
-            IReadOnlyStream inputStream1 = GetInputStream(args[0]);
-            IReadOnlyStream inputStream2 = GetInputStream(args[1]);
+            try
+            {
+                using (IReadOnlyStream inputStream1 = GetInputStream(args[0]))
+                using (IReadOnlyStream inputStream2 = GetInputStream(args[1]))
+                {
+                    IList<LetterStats> singleLetterStats = FillSingleLetterStats(inputStream1);
+                    IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
 
-            IList<LetterStats> singleLetterStats = FillSingleLetterStats(inputStream1);
-            IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
+                    RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
+                    RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
 
-            RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
-            RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
+                    PrintStatistic(singleLetterStats);
+                    PrintStatistic(doubleLetterStats);
+                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine($"Ошибка, Передано {args.Length} аргументов командой строки вместо 2!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Возникла непредвиденная ошибка! \nТекст ошибки: " + ex.ToString());
+            }
 
-            PrintStatistic(singleLetterStats);
-            PrintStatistic(doubleLetterStats);
-
-            // TODO : Необжодимо дождаться нажатия клавиши, прежде чем завершать выполнение программы.
+            Console.WriteLine("\n");
+            Console.Write("Нажмите на любую кнопку, чтобы закрыть программу: ");
+            Console.ReadKey();
         }
 
         /// <summary>
@@ -50,15 +79,22 @@ namespace TestTask
         private static IList<LetterStats> FillSingleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
+            ILetterAnalysisStorage storage = new DictionaryLetterStorage();
+
             while (!stream.IsEof)
             {
                 char c = stream.ReadNextChar();
-                // TODO : заполнять статистику с использованием метода IncStatistic. Учёт букв - регистрозависимый.
+
+                if (!char.IsLetter(c))
+                {
+                    continue;
+                }
+
+                string letterText = c.ToString();
+                storage.HandleText(letterText);
             }
 
-            //return ???;
-
-            throw new NotImplementedException();
+            return storage.GetStatistics();
         }
 
         /// <summary>
@@ -71,15 +107,40 @@ namespace TestTask
         private static IList<LetterStats> FillDoubleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
+            ILetterAnalysisStorage storage = new DictionaryLetterStorage();
+
+            bool hasPair = false;
+            char previousChar = ' ';
+
             while (!stream.IsEof)
             {
                 char c = stream.ReadNextChar();
-                // TODO : заполнять статистику с использованием метода IncStatistic. Учёт букв - НЕ регистрозависимый.
+                if (!char.IsLetter(c))
+                {
+                    hasPair = false;
+                    continue;
+                }
+
+                if (!hasPair)
+                {
+                    previousChar = c;
+                    hasPair = true;
+                    continue;
+                }
+
+                char upperFirstChar = char.ToUpper(previousChar);
+                char upperSecondChar = char.ToUpper(c);
+
+                if (upperFirstChar != upperSecondChar)
+                {
+                    continue;
+                }
+
+                string letterText = string.Concat(upperFirstChar, upperSecondChar);
+                storage.HandleText(letterText);
             }
 
-            //return ???;
-
-            throw new NotImplementedException();
+            return storage.GetStatistics();
         }
 
         /// <summary>
@@ -91,15 +152,19 @@ namespace TestTask
         /// <param name="charType">Тип букв для анализа</param>
         private static void RemoveCharStatsByType(IList<LetterStats> letters, CharType charType)
         {
-            // TODO : Удалить статистику по запрошенному типу букв.
             switch (charType)
             {
                 case CharType.Consonants:
+                {
+                    RemoveAllConsonants(letters);
                     break;
+                }
                 case CharType.Vowel:
+                {
+                    RemoveAllVowels(letters);
                     break;
+                }
             }
-            
         }
 
         /// <summary>
@@ -116,14 +181,21 @@ namespace TestTask
         }
 
         /// <summary>
-        /// Метод увеличивает счётчик вхождений по переданной структуре.
+        /// Удаляет все согласные из списка статистики
         /// </summary>
-        /// <param name="letterStats"></param>
-        private static void IncStatistic(LetterStats letterStats)
+        /// <param name="letters">список статистики</param>
+        private static void RemoveAllConsonants(IList<LetterStats> letters)
         {
-            letterStats.Count++;
+            letters = letters.Where(x => VOWELS.Contains(x.Letter[0])).ToList();
         }
 
-
+        /// <summary>
+        /// Удаляет все гласные из списка статистики
+        /// </summary>
+        /// <param name="letters">список статистики</param>
+        private static void RemoveAllVowels(IList<LetterStats> letters)
+        {
+            letters = letters.Where(x => !VOWELS.Contains(x.Letter[0])).ToList();
+        }
     }
 }
