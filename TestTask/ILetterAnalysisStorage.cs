@@ -9,7 +9,7 @@ namespace TestTask
     {
         void HandleText(string text);
 
-        void IncStatistic(LetterStats letterStats);
+        void IncStatistic(string key, LetterStats value);
 
         IList<LetterStats> GetStatistics();
     }
