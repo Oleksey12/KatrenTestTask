@@ -77,15 +77,22 @@ namespace TestTask
         private static IList<LetterStats> FillSingleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
+            ILetterAnalysisStorage storage = new LetterAnalysisStorage();
+
             while (!stream.IsEof)
             {
                 char c = stream.ReadNextChar();
-                // TODO : заполнять статистику с использованием метода IncStatistic. Учёт букв - регистрозависимый.
+
+                if (!char.IsLetter(c))
+                {
+                    continue;
+                }
+
+                string letterText = c.ToString();
+                storage.HandleText(letterText);
             }
 
-            //return ???;
-
-            throw new NotImplementedException();
+            return storage.GetStatistics();
         }
 
         /// <summary>
@@ -98,15 +105,40 @@ namespace TestTask
         private static IList<LetterStats> FillDoubleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
+            ILetterAnalysisStorage storage = new LetterAnalysisStorage();
+
+            bool hasPair = false;
+            char previousChar = ' ';
+
             while (!stream.IsEof)
             {
                 char c = stream.ReadNextChar();
-                // TODO : заполнять статистику с использованием метода IncStatistic. Учёт букв - НЕ регистрозависимый.
+                if (!char.IsLetter(c))
+                {
+                    hasPair = false;
+                    continue;
+                }
+
+                if (!hasPair)
+                {
+                    previousChar = c;
+                    hasPair = true;
+                    continue;
+                }
+
+                char upperFirstChar = char.ToUpper(previousChar);
+                char upperSecondChar = char.ToUpper(c);
+
+                if (upperFirstChar != upperSecondChar)
+                {
+                    continue;
+                }
+
+                string letterText = string.Concat(upperFirstChar, upperSecondChar);
+                storage.HandleText(letterText);
             }
 
-            //return ???;
-
-            throw new NotImplementedException();
+            return storage.GetStatistics();
         }
 
         /// <summary>
@@ -141,16 +173,5 @@ namespace TestTask
             // TODO : Выводить на экран статистику. Выводить предварительно отсортировав по алфавиту!
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Метод увеличивает счётчик вхождений по переданной структуре.
-        /// </summary>
-        /// <param name="letterStats"></param>
-        private static void IncStatistic(LetterStats letterStats)
-        {
-            letterStats.Count++;
-        }
-
-
     }
 }
