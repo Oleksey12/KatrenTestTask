@@ -57,18 +57,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharType.cs" />
-    <Compile Include="FileStreamFacade.cs" />
-    <Compile Include="BaseReadonlyStreamFactory.cs" />
-    <Compile Include="ILetterAnalysisStorage.cs" />
-    <Compile Include="IReadOnlyStream.cs" />
-    <Compile Include="LetterStats.cs" />
+    <Compile Include="LetterAnalysis\CharType.cs" />
+    <Compile Include="Utilities\ConsoleHelperMethods.cs" />
+    <Compile Include="ReadOnlyStream\IReadOnlyStreamFactory.cs" />
+    <Compile Include="LetterAnalysis\LetterAnalysisFacade.cs" />
+    <Compile Include="ReadOnlyStream\BaseReadOnlyStreamFactory.cs" />
+    <Compile Include="LetterAnalysis\ILetterAnalysisStorage.cs" />
+    <Compile Include="ReadOnlyStream\IReadOnlyStream.cs" />
+    <Compile Include="LetterAnalysis\LetterStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadOnlyStream.cs" />
+    <Compile Include="ReadOnlyStream\ReadOnlyStream.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DictionaryLetterStorage.cs" />
+    <Compile Include="LetterAnalysis\DictionaryLetterStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

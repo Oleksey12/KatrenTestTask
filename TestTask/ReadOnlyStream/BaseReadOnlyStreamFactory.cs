@@ -14,7 +14,7 @@ namespace TestTask
         /// <param name="fileFullPath">Полный путь до файла для чтения</param>
         /// <exception cref="ArgumentNullException">Выкидывается в случае передачи пустой строки</exception> 
         /// <exception cref="DirectoryNotFoundException">Выкидывается в случае передачи несуществующей директории</exception> 
-        /// <exception cref="ArgumentNullException">Выкидывается в случае, если файл не существует</exception> 
+        /// <exception cref="FileNotFoundException">Выкидывается в случае, если файл не существует</exception> 
         /// <exception cref="NullReferenceException">Выкидывается в случае, если не удалось создать итоговый объект</exception> 
         /// <returns>Поток для последующего чтения.</returns>
         public virtual IReadOnlyStream GetInputStream(string fileFullPath)
