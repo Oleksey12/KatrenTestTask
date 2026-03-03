@@ -113,7 +113,7 @@ namespace TestTask
                 }
 
                 string letterText = c.ToString();
-                storage.HandleText(letterText);
+                storage.Add(letterText);
             }
 
             return storage.GetStatistics();
@@ -160,7 +160,7 @@ namespace TestTask
                 }
 
                 string letterText = string.Concat(upperFirstChar, upperSecondChar);
-                storage.HandleText(letterText);
+                storage.Add(letterText);
             }
 
             return storage.GetStatistics();
