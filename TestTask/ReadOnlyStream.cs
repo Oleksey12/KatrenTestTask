@@ -56,7 +56,6 @@ namespace TestTask
         public bool IsEof
         {
             get => _isEof;
-            
             private set => _isEof = value;
         }
 
@@ -103,7 +102,6 @@ namespace TestTask
             {
                 _localReader.Close();
             }
-
             if (_localStream != null)
             {
                 _localStream.Close();
