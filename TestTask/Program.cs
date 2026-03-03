@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace TestTask
 {
@@ -16,19 +17,45 @@ namespace TestTask
         /// Второй параметр - путь до второго файла.</param>
         static void Main(string[] args)
         {
-            IReadOnlyStream inputStream1 = GetInputStream(args[0]);
-            IReadOnlyStream inputStream2 = GetInputStream(args[1]);
+            try
+            {
+                using (IReadOnlyStream inputStream1 = GetInputStream(args[0]))
+                using (IReadOnlyStream inputStream2 = GetInputStream(args[1]))
+                {
+                    IList<LetterStats> singleLetterStats = FillSingleLetterStats(inputStream1);
+                    IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
 
-            IList<LetterStats> singleLetterStats = FillSingleLetterStats(inputStream1);
-            IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
+                    RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
+                    RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
 
-            RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
-            RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
+                    PrintStatistic(singleLetterStats);
+                    PrintStatistic(doubleLetterStats);
+                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine($"Ошибка, Передано {args.Length} аргументов командой строки вместо 2!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Возникла непредвиденная ошибка! \nТекст ошибки: " + ex.ToString());
+            }
 
-            PrintStatistic(singleLetterStats);
-            PrintStatistic(doubleLetterStats);
-
-            // TODO : Необжодимо дождаться нажатия клавиши, прежде чем завершать выполнение программы.
+            Console.WriteLine("\n");
+            Console.Write("Нажмите на любую кнопку, чтобы закрыть программу: ");
+            Console.ReadKey();
         }
 
         /// <summary>
