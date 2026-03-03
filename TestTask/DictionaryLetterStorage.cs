@@ -4,9 +4,9 @@ using System.Linq;
 namespace TestTask
 {
 	/// <summary>
-	/// Контейнер для подсчёта количества вхождений текста
+	/// Контейнер для подсчёта количества вхождений текста с помощью словаря
 	/// </summary>
-	public class LetterAnalysisStorage : ILetterAnalysisStorage
+	public class DictionaryLetterStorage : ILetterAnalysisStorage
 	{
 		private readonly Dictionary<string, LetterStats> _data = new Dictionary<string, LetterStats>();
 

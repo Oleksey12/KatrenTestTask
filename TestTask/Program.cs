@@ -79,7 +79,7 @@ namespace TestTask
         private static IList<LetterStats> FillSingleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
-            ILetterAnalysisStorage storage = new LetterAnalysisStorage();
+            ILetterAnalysisStorage storage = new DictionaryLetterStorage();
 
             while (!stream.IsEof)
             {
@@ -107,7 +107,7 @@ namespace TestTask
         private static IList<LetterStats> FillDoubleLetterStats(IReadOnlyStream stream)
         {
             stream.ResetPositionToStart();
-            ILetterAnalysisStorage storage = new LetterAnalysisStorage();
+            ILetterAnalysisStorage storage = new DictionaryLetterStorage();
 
             bool hasPair = false;
             char previousChar = ' ';
@@ -181,7 +181,7 @@ namespace TestTask
         }
 
         /// <summary>
-        /// Удаляет все согласные из статистики
+        /// Удаляет все согласные из списка статистики
         /// </summary>
         /// <param name="letters">список статистики</param>
         private static void RemoveAllConsonants(IList<LetterStats> letters)
@@ -190,7 +190,7 @@ namespace TestTask
         }
 
         /// <summary>
-        /// Удаляет все гласные из статистики
+        /// Удаляет все гласные из списка статистики
         /// </summary>
         /// <param name="letters">список статистики</param>
         private static void RemoveAllVowels(IList<LetterStats> letters)

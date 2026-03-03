@@ -3,7 +3,7 @@
 namespace TestTask
 {
     /// <summary>
-    /// Интерфейс хранилища для работы с LetterStats
+    /// Интерфейс контейнера для подсчёта количества вхождений текста
     /// </summary>
     internal interface ILetterAnalysisStorage
     {
