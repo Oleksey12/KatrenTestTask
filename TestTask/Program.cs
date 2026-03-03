@@ -22,17 +22,28 @@ namespace TestTask
             try
             {
                 using (IReadOnlyStream inputStream1 = GetInputStream(args[0]))
-                using (IReadOnlyStream inputStream2 = GetInputStream(args[1]))
                 {
                     IList<LetterStats> singleLetterStats = FillSingleLetterStats(inputStream1);
-                    IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
+                    singleLetterStats = RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
 
-                    RemoveCharStatsByType(singleLetterStats, CharType.Vowel);
-                    RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
-
+                    Console.WriteLine($"Результаты анализа файла {args[0]}\n");
                     PrintStatistic(singleLetterStats);
+                }
+
+                Console.WriteLine("\n");
+
+                using (IReadOnlyStream inputStream2 = GetInputStream(args[1]))
+                {
+                    IList<LetterStats> doubleLetterStats = FillDoubleLetterStats(inputStream2);
+                    doubleLetterStats = RemoveCharStatsByType(doubleLetterStats, CharType.Consonants);
+
+                    Console.WriteLine($"Результаты анализа файла {args[1]}\n");
                     PrintStatistic(doubleLetterStats);
                 }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine($"Ошибка, Передано {args.Length} аргументов командой строки вместо 2!");
             }
             catch (ArgumentNullException ex)
             {
@@ -46,17 +57,13 @@ namespace TestTask
             {
                 Console.WriteLine(ex.Message);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine($"Ошибка, Передано {args.Length} аргументов командой строки вместо 2!");
-            }
             catch (Exception ex)
             {
                 Console.WriteLine("Возникла непредвиденная ошибка! \nТекст ошибки: " + ex.ToString());
             }
 
             Console.WriteLine("\n");
-            Console.Write("Нажмите на любую кнопку, чтобы закрыть программу: ");
+            Console.Write("Нажмите на любую кнопку, чтобы закрыть программу...");
             Console.ReadKey();
         }
 
@@ -67,6 +74,21 @@ namespace TestTask
         /// <returns>Поток для последующего чтения.</returns>
         private static IReadOnlyStream GetInputStream(string fileFullPath)
         {
+            if (fileFullPath == null)
+            {
+                throw new ArgumentNullException("Передано null вместо названия файла");
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fileFullPath)))
+            {
+                throw new DirectoryNotFoundException($"Директории с файлом {fileFullPath} не существует");
+            }
+
+            if (!File.Exists(fileFullPath))
+            {
+                throw new FileNotFoundException($"Файла в пути {fileFullPath} не существует");
+            }
+
             return new ReadOnlyStream(fileFullPath);
         }
 
@@ -123,13 +145,14 @@ namespace TestTask
 
                 if (!hasPair)
                 {
-                    previousChar = c;
+                    previousChar = char.ToUpper(c);
                     hasPair = true;
                     continue;
                 }
 
-                char upperFirstChar = char.ToUpper(previousChar);
+                char upperFirstChar = previousChar;
                 char upperSecondChar = char.ToUpper(c);
+                previousChar = upperSecondChar;
 
                 if (upperFirstChar != upperSecondChar)
                 {
@@ -150,19 +173,21 @@ namespace TestTask
         /// </summary>
         /// <param name="letters">Коллекция со статистиками вхождения букв/пар</param>
         /// <param name="charType">Тип букв для анализа</param>
-        private static void RemoveCharStatsByType(IList<LetterStats> letters, CharType charType)
+        private static IList<LetterStats> RemoveCharStatsByType(IList<LetterStats> letters, CharType charType)
         {
             switch (charType)
             {
                 case CharType.Consonants:
                 {
-                    RemoveAllConsonants(letters);
-                    break;
+                    return RemoveAllConsonants(letters);
                 }
                 case CharType.Vowel:
                 {
-                    RemoveAllVowels(letters);
-                    break;
+                    return RemoveAllVowels(letters);
+                }
+                default:
+                {
+                    return letters;
                 }
             }
         }
@@ -174,28 +199,40 @@ namespace TestTask
         /// В конце отдельная строчка с ИТОГО, содержащая в себе общее кол-во найденных букв/пар
         /// </summary>
         /// <param name="letters">Коллекция со статистикой</param>
-        private static void PrintStatistic(IEnumerable<LetterStats> letters)
+        private static void PrintStatistic(IEnumerable<LetterStats> letters, int columnLength = 15)
         {
-            // TODO : Выводить на экран статистику. Выводить предварительно отсортировав по алфавиту!
-            throw new NotImplementedException();
+            IEnumerable<LetterStats> sortedLetters = letters.OrderBy(x => x.Letter);
+
+            Console.WriteLine($"|{new string('-', columnLength)}|{new string('-', columnLength)}|");
+            Console.WriteLine($"|{"Буква".PadRight(columnLength)}|{"Кол-во".PadRight(columnLength)}|");
+            foreach (LetterStats letterData in sortedLetters)
+            {
+                Console.WriteLine($"|{new string('-', columnLength)}|{new string('-', columnLength)}|");
+                string letterText = letterData.Letter;
+                string countText = letterData.Count.ToString();
+
+                Console.WriteLine($"|{letterText.PadRight(columnLength)}|{countText.PadRight(columnLength)}|");
+            }
+
+            Console.WriteLine($"|{new string('-', columnLength)}|{new string('-', columnLength)}|");
         }
 
         /// <summary>
         /// Удаляет все согласные из списка статистики
         /// </summary>
         /// <param name="letters">список статистики</param>
-        private static void RemoveAllConsonants(IList<LetterStats> letters)
+        private static IList<LetterStats> RemoveAllConsonants(IList<LetterStats> letters)
         {
-            letters = letters.Where(x => VOWELS.Contains(x.Letter[0])).ToList();
+            return letters.Where(x => VOWELS.Contains(x.Letter[0])).ToList();
         }
 
         /// <summary>
         /// Удаляет все гласные из списка статистики
         /// </summary>
         /// <param name="letters">список статистики</param>
-        private static void RemoveAllVowels(IList<LetterStats> letters)
+        private static IList<LetterStats> RemoveAllVowels(IList<LetterStats> letters)
         {
-            letters = letters.Where(x => !VOWELS.Contains(x.Letter[0])).ToList();
+            return letters.Where(x => !VOWELS.Contains(x.Letter[0])).ToList();
         }
     }
 }
