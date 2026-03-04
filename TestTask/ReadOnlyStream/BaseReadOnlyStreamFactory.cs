@@ -43,7 +43,7 @@ namespace TestTask
                 reader = new StreamReader(dataStream);
                 stream = new ReadOnlyStream(dataStream, reader);
             }
-            catch
+            catch (Exception ex)
             {
                 if (dataStream != null)
                 {
@@ -53,7 +53,7 @@ namespace TestTask
                 {
                     reader.Dispose();
                 }
-                throw new NullReferenceException("Ошибка, не удалось создать объект ReadOnlyStream");
+                throw new NullReferenceException($"Ошибка, не удалось создать объект ReadOnlyStream\nТекст ошибки {ex.Message}");
             }
 
             return stream;
