@@ -4,7 +4,7 @@ using System.IO;
 namespace TestTask
 {
     /// <summary>
-    /// Простая фабрика для создания потока данных
+    /// Простая фабрика для создания потоков для чтения
     /// </summary>
     internal class BaseReadOnlyStreamFactory : IReadOnlyStreamFactory
     {

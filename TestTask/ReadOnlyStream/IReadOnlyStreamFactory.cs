@@ -1,7 +1,7 @@
 ﻿namespace TestTask
 {
     /// <summary>
-    /// Интерфейс фабрики классов для работы с потоками
+    /// Интерфейс фабрики классов для создания потоков для чтения
     /// </summary>
     internal interface IReadOnlyStreamFactory
     {
